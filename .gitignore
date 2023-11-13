@@ -1,1 +1,4 @@
-Yeet
+__pycache__/
+
+*.json
+*.cache
