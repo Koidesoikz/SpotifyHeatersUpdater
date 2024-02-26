@@ -1,4 +1,6 @@
+# SpotifyHeatersUpdater
 Holder min "Newest Heaters" playliste updateret automatisk
 
-#Dependencies:
+## Dependencies:
 - spotipy
+    - Pip: `pip install spotipy --upgrade`
