@@ -21,9 +21,14 @@ def DeleteOldSongs(spotify, timeToCheck, secrets):
     names = []
 
     for song in heaters:
+        ShowSongStats(song, timeToCheck)
         if datetime.fromisoformat(song["added_at"]).timestamp() < timeToCheck:
             songsToRemove.append(song["track"]["id"])
             names.append(song["track"]["name"])
+
+    print("")
+    print(f"{'':-<100}")
+    print("")
 
     if(len(songsToRemove) != 0):
         print(f"Removing the following {len(songsToRemove)} songs:")
@@ -35,6 +40,10 @@ def DeleteOldSongs(spotify, timeToCheck, secrets):
         print("Done!")
     else:
         print("No songs to delete :)")
+
+def ShowSongStats(song, timeToCheck):
+    timeLeft = timedelta(seconds=(datetime.fromisoformat(song["added_at"]).timestamp() - timeToCheck))
+    print(f"{str(timeLeft.days) + ' days left':-<20}|{song['track']['name'].strip()}")
 
 def AddNewSongs(ranscheiID, spotify: spotipy.Spotify, timeToCheck, secrets):
     sentinal = True
@@ -101,18 +110,22 @@ def AddNewSongs(ranscheiID, spotify: spotipy.Spotify, timeToCheck, secrets):
     else:
         print("No new songs to add :)")
 
-secrets = json.load(open("D:\Programmering\Github\SpotifyHeatersUpdater\Secrets.json"))
-ranscheiID = secrets["ranschei_id"]
+def Main():
+    secrets = json.load(open("D:\Programmering\Github\SpotifyHeatersUpdater\Secrets.json"))
+    ranscheiID = secrets["ranschei_id"]
 
-scope = "playlist-modify-public"
+    scope = "playlist-modify-public"
 
-authManager = SpotifyOAuth(client_id=secrets["client_id"], client_secret=secrets["client_secret"], scope=scope, redirect_uri="http://localhost/")
-spotify  = spotipy.Spotify(auth_manager=authManager)
+    authManager = SpotifyOAuth(client_id=secrets["client_id"], client_secret=secrets["client_secret"], scope=scope, redirect_uri="http://localhost/")
+    spotify  = spotipy.Spotify(auth_manager=authManager)
 
-timeToCheck = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
+    timeToCheck = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
 
-DeleteOldSongs(spotify, timeToCheck, secrets)
+    DeleteOldSongs(spotify, timeToCheck, secrets)
 
-AddNewSongs(ranscheiID, spotify, timeToCheck, secrets)
+    AddNewSongs(ranscheiID, spotify, timeToCheck, secrets)
 
-input()
+    input()
+
+if __name__ == '__main__':
+    Main()
