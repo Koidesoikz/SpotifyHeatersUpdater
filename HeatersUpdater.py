@@ -43,7 +43,13 @@ def DeleteOldSongs(spotify, timeToCheck, secrets):
 
 def ShowSongStats(song, timeToCheck):
     timeLeft = timedelta(seconds=(datetime.fromisoformat(song["added_at"]).timestamp() - timeToCheck))
-    print(f"{str(timeLeft.days) + ' days left':-<20}|{song['track']['name'].strip()}")
+    if timeLeft.days == 0:
+        if (timeLeft.seconds/60)/60 < 1:
+            print(f"{str(int(round(timeLeft.seconds/60, 0))) + ' minutes left':-<20}|{song['track']['name'].strip()}")
+        else:
+            print(f"{str(int(round((timeLeft.seconds/60)/60, 0))) + ' hours left':-<20}|{song['track']['name'].strip()}")
+    else:
+        print(f"{str(timeLeft.days) + ' days left':-<20}|{song['track']['name'].strip()}")
 
 def AddNewSongs(ranscheiID, spotify: spotipy.Spotify, timeToCheck, secrets):
     sentinal = True
@@ -111,7 +117,7 @@ def AddNewSongs(ranscheiID, spotify: spotipy.Spotify, timeToCheck, secrets):
         print("No new songs to add :)")
 
 def Main():
-    secrets = json.load(open("D:\Programmering\Github\SpotifyHeatersUpdater\Secrets.json"))
+    secrets = json.load(open("D:\\Programmering\\Github\\SpotifyHeatersUpdater\\Secrets.json"))
     ranscheiID = secrets["ranschei_id"]
 
     scope = "playlist-modify-public"
