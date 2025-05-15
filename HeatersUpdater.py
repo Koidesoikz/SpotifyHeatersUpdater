@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-import spotipy, json
+import spotipy, json, os
 from spotipy.oauth2 import SpotifyOAuth
 from datetime import datetime, timezone, timedelta
+from dotenv import load_dotenv
 
 def GetAllPlaylistTracks(spotify, playlistId):
     playlist = spotify.playlist(playlist_id=playlistId)["tracks"]
@@ -15,7 +16,7 @@ def GetAllPlaylistTracks(spotify, playlistId):
     return tracks
 
 def DeleteOldSongs(spotify, timeToCheck, secrets):
-    heaters = GetAllPlaylistTracks(spotify, secrets["playlist_id"])
+    heaters = GetAllPlaylistTracks(spotify, secrets["heaters_id"])
 
     songsToRemove = []
     names = []
@@ -36,7 +37,7 @@ def DeleteOldSongs(spotify, timeToCheck, secrets):
             print(f"id: {songsToRemove[x]} | name: {names[x]}")
         
         print("\nDeleting...")
-        spotify.playlist_remove_all_occurrences_of_items(playlist_id=secrets["playlist_id"], items=songsToRemove)
+        spotify.playlist_remove_all_occurrences_of_items(playlist_id=secrets["heaters_id"], items=songsToRemove)
         print("Done!")
     else:
         print("No songs to delete :)")
@@ -86,7 +87,7 @@ def AddNewSongs(ranscheiID, spotify: spotipy.Spotify, timeToCheck, secrets):
             idsToAdd = tempIdsToAdd + idsToAdd
             sentinal = False
 
-    heaters = spotify.playlist(playlist_id=secrets["playlist_id"])
+    heaters = spotify.playlist(playlist_id=secrets["heaters_id"])
 
     preAddedSongs = []
     preAddedNames = []
@@ -111,13 +112,19 @@ def AddNewSongs(ranscheiID, spotify: spotipy.Spotify, timeToCheck, secrets):
             print(f"id: {finalSongsToAdd[x]} | name: {finalNames[x]}")
 
         print("\nAdding...")
-        spotify.playlist_add_items(playlist_id=secrets["playlist_id"], items=finalSongsToAdd)
+        spotify.playlist_add_items(playlist_id=secrets["heaters_id"], items=finalSongsToAdd)
         print("Done!")
     else:
         print("No new songs to add :)")
 
 def Main():
-    secrets = json.load(open("D:\\Programmering\\Github\\SpotifyHeatersUpdater\\Secrets.json"))
+    load_dotenv()
+    secrets = {
+        "client_id": os.getenv("CLIENT_ID"),
+        "client_secret": os.getenv("CLIENT_SECRET"),
+        "heaters_id": os.getenv("HEATERS_ID"),
+        "ranschei_id": os.getenv("RANSCHEI_ID")
+    }
     ranscheiID = secrets["ranschei_id"]
 
     scope = "playlist-modify-public"
