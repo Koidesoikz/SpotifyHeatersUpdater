@@ -94,6 +94,9 @@ def AddNewSongs(ranscheiID, spotify: spotipy.Spotify, timeToCheck, secrets):
     finalSongsToAdd = []
     finalNames = []
 
+    if heaters["tracks"]["total"] > 100:
+        heaters["tracks"]["items"] = GetAllPlaylistTracks(spotify, secrets["heaters_id"])
+
     for song in heaters["tracks"]["items"]:
         preAddedSongs.append(song["track"]["uri"])
         preAddedNames.append(song["track"]["name"])
